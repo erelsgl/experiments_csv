@@ -1,4 +1,6 @@
 # experiments_csv
+[![PyPI version](https://badge.fury.io/py/experiments_csv.svg)](https://badge.fury.io/py/experiments_csv)
+
 A simple framework for managing simulation experiments and recording them into a CSV fie.
 See the [demo program](demo/demo.py) for usage example. In detail, you should:
 
