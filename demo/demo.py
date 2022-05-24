@@ -1,6 +1,6 @@
-import experiments, logging
-experiments.logger.setLevel(logging.DEBUG)
-ex = experiments.Experiment("results/", "results.csv", "results/backup")
+import experiments_csv, logging
+experiments_csv.logger.setLevel(logging.DEBUG)
+ex = experiments_csv.Experiment("results/", "results.csv", "results/backup")
 
 
 def add_three_numbers(x, y, z):

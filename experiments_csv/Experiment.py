@@ -4,8 +4,8 @@ An abstract class that represents an experiment.
 
 from typing import Dict, List, Any, Callable
 import pandas, os, logging, shutil, pathlib
-from experiments.dict_product import dict_product
-from experiments.dict_to_row import dict_to_row
+from experiments_csv.dict_product import dict_product
+from experiments_csv.dict_to_row import dict_to_row
 from datetime import datetime
 
 import logging
@@ -79,7 +79,7 @@ class Experiment:
             else:
                 existing_row = dict_to_row(self.dataFrame, input)
                 if existing_row:
-                    logger.info("\ninput: %s\nexisting row: %s", input, existing_row)
+                    logger.info("\nskipped input: %s\nexisting row: %s", input, existing_row)
                     continue
                 else:
                     output = single_run(**input)

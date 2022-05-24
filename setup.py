@@ -1,7 +1,7 @@
 import pathlib
 import setuptools
 
-NAME = "experiments"
+NAME = "experiments_csv"
 URL = "https://github.com/erelsgl/" + NAME
 HERE = pathlib.Path(__file__).parent
 print(f"\nHERE = {HERE.absolute()}\n")
@@ -19,7 +19,7 @@ setuptools.setup(
     install_requires=REQUIRES,
     author="Erel Segal-Halevi",
     author_email="erelsgl@gmail.com",
-    description="Simple framework for running simulation experiments",
+    description="Simple framework for running simulation experiments and recording them in a CSV file",
     keywords="experiments",
     license="MIT",
     license_files=("LICENSE",),
