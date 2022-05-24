@@ -53,7 +53,7 @@ class Experiment:
         Add a data-row whose values exactly match the columns in self.columns.
         """
         if self.dataFrame is None:
-            columns = new_row.keys()
+            columns = list(new_row.keys())
             logger.debug("    Inserting first row: setting columns to %s", columns)
             self.dataFrame = pandas.DataFrame(columns=columns)
 
@@ -79,13 +79,13 @@ class Experiment:
             else:
                 existing_row = dict_to_row(self.dataFrame, input)
                 if existing_row:
-                    logger.info("  input: %s, existing row: %s", input, existing_row)
+                    logger.info("\ninput: %s\nexisting row: %s", input, existing_row)
                     continue
                 else:
                     output = single_run(**input)
             if not isinstance(output, dict):
                 raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
-            logger.info("  input: %s, output: %s", input, output)
+            logger.info("\ninput: %s\noutput: %s", input, output)
             self.add({**input, **output})
 
         logger.info("Done!")
@@ -96,3 +96,5 @@ class Experiment:
 
 
 Experiment.logger = logger
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
