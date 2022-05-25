@@ -23,7 +23,6 @@ class Experiment:
         If the file does not exist, an empty table is initialized and the file will be created when the table is "done".
         """
         pathlib.Path(results_folder).mkdir(parents=True, exist_ok=True)            
-        pathlib.Path(backup_folder).mkdir(parents=True, exist_ok=True)
         results_file = os.path.join(results_folder, results_filename)
         if os.path.isfile(results_file):
             # Load existing file:
@@ -31,11 +30,13 @@ class Experiment:
             logger.info("Loaded %d rows from %s.", self.dataFrame.shape[0], results_file)
 
             # Backup existing file into the 'backup' folder:
-            modification_timestamp = os.path.getmtime(results_file)
-            modification_datetime = datetime.fromtimestamp(modification_timestamp).strftime("%Y_%m_%d__%H_%M_%S")
-            backup_filename = results_filename.replace(".csv",f".{modification_datetime}.csv")
-            backup_file = os.path.join(backup_folder, backup_filename)
-            shutil.copyfile(results_file, backup_file)
+            if backup_folder is not None:
+                pathlib.Path(backup_folder).mkdir(parents=True, exist_ok=True)
+                modification_timestamp = os.path.getmtime(results_file)
+                modification_datetime = datetime.fromtimestamp(modification_timestamp).strftime("%Y_%m_%d__%H_%M_%S")
+                backup_filename = results_filename.replace(".csv",f".{modification_datetime}.csv")
+                backup_file = os.path.join(backup_folder, backup_filename)
+                shutil.copyfile(results_file, backup_file)
 
         else:
             self.dataFrame = None  # will be initialized when the first row is added
@@ -74,25 +75,35 @@ class Experiment:
         :param input_ranges: a dict where the key is the parameter name, and the value is a list of possible values for that parameter.
         """
         for input in dict_product(input_ranges):
+            input_normalized = {k:normalized(v) for k,v in input.items()}
             if self.dataFrame is None:
                 output = single_run(**input)
             else:
-                existing_row = dict_to_row(self.dataFrame, input)
+                try:
+                    existing_row = dict_to_row(self.dataFrame, input_normalized)
+                except KeyError as err:
+                    raise KeyError(f"You sent an input field that does not have a column in the existing CSV file. Please start a new CSV file. Error: ", {err} )
                 if existing_row:
-                    logger.info("\nskipped input: %s\nexisting row: %s", input, existing_row)
+                    logger.info("\nskipped input: %s\nexisting row: %s", input_normalized, existing_row)
                     continue
                 else:
                     output = single_run(**input)
             if not isinstance(output, dict):
                 raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
-            logger.info("\ninput: %s\noutput: %s", input, output)
-            self.add({**input, **output})
+            logger.info("\ninput: %s\noutput: %s", input_normalized, output)
+            self.add({**input_normalized, **output})
 
         logger.info("Done!")
-        # self.to_csv(self.results_file)
-        # if os.path.exists(self.csvFileNameTemp):
-        #     logger.info("Removing temporary CSV file %s", self.csvFileNameTemp)
-        #     os.remove(self.csvFileNameTemp)
+
+
+def normalized(value):
+    """
+    Return a normalized version of the given value, for insertion into the table.
+    """
+    if hasattr(value,'__name__'):
+        return value.__name__
+    else:
+        return value
 
 
 Experiment.logger = logger

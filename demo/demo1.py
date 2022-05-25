@@ -1,6 +1,10 @@
+"""
+Demo 1: Basic usage.
+"""
+
 import experiments_csv, logging
 experiments_csv.logger.setLevel(logging.DEBUG)
-ex = experiments_csv.Experiment("results/", "results.csv", "results/backup")
+ex = experiments_csv.Experiment("results/", "demo1.csv", "results/backups/")
 
 
 def add_three_numbers(x, y, z):
