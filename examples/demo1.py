@@ -3,7 +3,7 @@ Demo 1: Basic usage.
 """
 
 import experiments_csv, logging
-experiments_csv.logger.setLevel(logging.DEBUG)
+experiments_csv.logger.setLevel(logging.INFO)
 ex = experiments_csv.Experiment("results/", "demo1.csv", "results/backups/")
 
 
@@ -18,6 +18,7 @@ input_ranges = {
     "y": [4,5],
     "z": [6]
 }
+# ex.clear_previous_results() # Uncomment this if you want to restart all experiments from scratch
 ex.run(add_three_numbers, input_ranges)
 
 print("\n\nSECOND EXPERIMENT\n")

@@ -1,8 +1,16 @@
-# experiments_csv
+# experiments_csv - experiment tracking via CSV files
 [![PyPI version](https://badge.fury.io/py/experiments_csv.svg)](https://badge.fury.io/py/experiments_csv)
 
-A simple framework for managing simulation experiments and recording them into a CSV fie.
-See the [demo program](demo/demo.py) for usage example. In detail, you should:
+## Motivation
+You run an experiments with various input parameters. You check various input combinations and run the experiment on each combination.
+
+Suddenly, during one of the runs, the program crashes. You have to restart the experiment for the current and future inputs, but you do not want to repeat it for all previous inputs.
+
+## Solution
+`experiments_csv` saves all the experiment input and output data into a CSV file. When you restart the experiment, it reads the CSV file and notes all the input combinations for which the experiment already completed. It then automatically skips these input combinations.
+
+## Usage
+See the demo programs in the [examples](examples/) folder for usage examples. In detail, you should:
 
 1. Write a function for running a single instance of the experiment.
 The function may take any number of arguments as inputs.
@@ -21,7 +29,7 @@ For example:
         }
 ```
 
-2. Decide what ranges you want for your parameters, for example:
+2. Decide what ranges you want for your input parameters, for example:
 
 ```
     input_ranges = {
@@ -45,10 +53,19 @@ For example:
    ex.run(fair_division_algorithm, input_ranges)
 ```
 
-This loops over all combinations of inputs in the ranges you passed, calls the single-instance function, and records the results in the given CSV file. The CSV file will have a column for every input and output (in the example: num_of_agents, num_of_items, threshold, criterion, runtime, min_value, max_value), and a single row for every run (the Cartesian product of the ranges in input_ranges).
+This loops over all combinations of inputs in the ranges you passed (the Cartesian product of the ranges in input_ranges), calls the single-instance function, and records the results in the given CSV file. The CSV file will have a column for every input and output (in the example: num_of_agents, num_of_items, threshold, criterion, runtime, min_value, max_value), and a single row for every run.
 
-If the experiment stops abruptly due to an error (or you have to stop it manually for some reason), you can re-run the same code, and it will not repeat the experiments with the combinations of arguments it already completed - it will only run the experiments for the combinations not done yet.
+If the experiment stops abruptly due to an error, you can re-run the same code, and it will not repeat the experiments with the combinations of arguments it already completed - it will only run the experiments for the combinations not done yet.
 
-If you do want to restart the experiment from scratch, either manually delete the CSV file, or use a new CSV file with a different name.
+If you do want to restart the experiment from scratch, either manually delete the CSV file, or use a new CSV file with a different name, or do
+
+```
+   ex.clear_previous_results()
+```
+
+To log the inputs and outputs during run, you can do:
+```
+    experiments_csv.logger.setLevel(logging.INFO)
+```
 
 See the [demo program](demo/demo.py) for usage example

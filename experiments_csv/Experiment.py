@@ -43,6 +43,8 @@ class Experiment:
             logger.info("Initialized an empty DataFrame bound to %s.", results_file)
         self.results_file = results_file
 
+    def clear_previous_results(self):
+        self.dataFrame = None
 
     def to_csv(self, filename):
         self.dataFrame.to_csv(filename, columns=self.dataFrame.columns, index=False)
@@ -76,6 +78,7 @@ class Experiment:
         """
         for input in dict_product(input_ranges):
             input_normalized = {k:normalized(v) for k,v in input.items()}
+            logger.info("\nInput: %s", input_normalized)
             if self.dataFrame is None:
                 output = single_run(**input)
             else:
@@ -84,16 +87,16 @@ class Experiment:
                 except KeyError as err:
                     raise KeyError(f"You sent an input field that does not have a column in the existing CSV file. Please start a new CSV file. Error: ", {err} )
                 if existing_row:
-                    logger.info("\nskipped input: %s\nexisting row: %s", input_normalized, existing_row)
+                    logger.info("Skipped! Existing row: %s", existing_row)
                     continue
                 else:
                     output = single_run(**input)
             if not isinstance(output, dict):
                 raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
-            logger.info("\ninput: %s\noutput: %s", input_normalized, output)
+            logger.info("Output: %s", output)
             self.add({**input_normalized, **output})
 
-        logger.info("Done!")
+        logger.info("\nDone!")
 
 
 def normalized(value):
