@@ -3,8 +3,8 @@ Demo 1: Basic usage.
 """
 
 import experiments_csv, logging
-experiments_csv.logger.setLevel(logging.INFO)
 ex = experiments_csv.Experiment("results/", "demo1.csv", "results/backups/")
+ex.logger.setLevel(logging.INFO)
 
 
 def add_three_numbers(x, y, z):

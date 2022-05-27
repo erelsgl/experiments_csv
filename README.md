@@ -65,7 +65,7 @@ If you do want to restart the experiment from scratch, either manually delete th
 
 To log the inputs and outputs during run, you can do:
 ```
-    experiments_csv.logger.setLevel(logging.INFO)
+    ex.logger.setLevel(logging.INFO)
 ```
 
 See the [demo program](demo/demo.py) for usage example

@@ -47,9 +47,12 @@ class Experiment:
         self.dataFrame = None
 
     def to_csv(self, filename):
-        self.dataFrame.to_csv(filename, columns=self.dataFrame.columns, index=False)
-        # index=False means to not save the automatically-added index column.
-        # This is important - without it we might have problems later when adding new rows after load.
+        try:
+            self.dataFrame.to_csv(filename, columns=self.dataFrame.columns, index=False)
+            # index=False means to not save the automatically-added index column.
+            # This is important - without it we might have problems later when adding new rows after load.
+        except OSError as err:
+            logger.warn(f"OS error {err}")
 
     def add(self, new_row:dict):
         """
