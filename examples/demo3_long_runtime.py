@@ -1,5 +1,7 @@
 """
-Demo 3: Demonstrates runs that take a long time
+Demo 3: Demonstrates runs that take a long time.
+You can stop the run and then re-start it,
+    and it will pick up where it left.
 """
 import time
 

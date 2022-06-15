@@ -6,17 +6,61 @@ Since: 2022-05
 """
 
 import pandas
+from numbers import Number
 
 def dict_to_row(df: pandas.DataFrame, key:dict):
     """
+    Accepts a DataFrame and a dict mapping column-names to values.
+    Searches a row in which the given columns contain the given values.
+    Returns one such row if it exists, or None if no such row exists.
+
     >>> df = pandas.DataFrame({'a': [1,4,1], 'b': [2,5,5], 'c':[3,6,9], 'z':[123, 456, 159]})
     >>> dict_to_row(df, {"a":1, "b":2, "c":3})
     {'a': 1, 'b': 2, 'c': 3, 'z': 123}
+    
     >>> dict_to_row(df, {"a":1, "b":2, "c":9}) is None
     True
     """
     for k,v in key.items():
         df = df[df[k]==v]
+    if df.empty:
+        return None
+    else:
+        return df.iloc[0].to_dict()
+
+def dict_to_row_bounds(df: pandas.DataFrame, lowerbound: dict = {}, upperbound: dict = {}):
+    """
+    Accepts a DataFrame and two dict mapping column-names to values.
+    Searches a row in which:
+    * Each of the given *numeric* columns contains *at least* the values given in lowerbound, and *at most* the values given in upperbound.
+    * Each of the given *non-numeric* columns contains *exactly* the given values.
+
+    Returns one such row if it exists, or None if no such row exists.
+
+    >>> df = pandas.DataFrame({'a': [1,4,1], 'b': [2,5,5], 'c':['tt','uu','vv'], 'z':[123, 456, 159]})
+    >>> dict_to_row_bounds(df, upperbound={"a":1, "b":2, "c":'tt'})
+    {'a': 1, 'b': 2, 'c': 'tt', 'z': 123}
+    >>> dict_to_row_bounds(df, upperbound={"a":1, "b":3, "c":'tt'})
+    {'a': 1, 'b': 2, 'c': 'tt', 'z': 123}
+    >>> dict_to_row_bounds(df, upperbound={"a":5, "b":6, "c":'uu'})
+    {'a': 4, 'b': 5, 'c': 'uu', 'z': 456}
+    >>> dict_to_row_bounds(df, upperbound={"a":2, "b":1, "c":'tt'}) is None
+    True
+    >>> dict_to_row_bounds(df, upperbound={"a":1, "b":2, "c":'xx'}) is None
+    True
+    >>> dict_to_row_bounds(df, lowerbound={"a":2, "b":1, "c":'uu'})
+    {'a': 4, 'b': 5, 'c': 'uu', 'z': 456}
+    """
+    for k,v in upperbound.items():
+        if isinstance(v, Number):
+            df = df[df[k]<=v]
+        else:
+            df = df[df[k]==v]
+    for k,v in lowerbound.items():
+        if isinstance(v, Number):
+            df = df[df[k]>=v]
+        else:
+            df = df[df[k]==v]
     if df.empty:
         return None
     else:

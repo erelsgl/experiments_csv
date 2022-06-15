@@ -18,7 +18,7 @@ input_ranges = {
     "y": [4,5],
     "z": [6]
 }
-# ex.clear_previous_results() # Uncomment this if you want to restart all experiments from scratch
+ex.clear_previous_results() # Uncomment this if you want to restart all experiments from scratch
 ex.run(add_three_numbers, input_ranges)
 
 print("\n\nSECOND EXPERIMENT\n")
@@ -27,4 +27,4 @@ input_ranges = {
     "y": [4],
     "z": [5,6,7,8]
 }
-ex.run(add_three_numbers, input_ranges)
+ex.run(add_three_numbers, input_ranges)   # Can you guess how many combinations will be skipped in the second experiment?

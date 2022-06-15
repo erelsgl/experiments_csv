@@ -5,11 +5,19 @@ An abstract class that represents an experiment.
 from typing import Dict, List, Any, Callable
 import pandas, os, logging, shutil, pathlib
 from experiments_csv.dict_product import dict_product
-from experiments_csv.dict_to_row import dict_to_row
+from experiments_csv.dict_to_row import dict_to_row, dict_to_row_bounds
 from datetime import datetime
+from time import perf_counter
 
 import logging
 logger = logging.getLogger(__name__)
+
+RUNTIME_FIELD_NAME="runtime"
+
+
+SingleIterationFunction = Callable[[Any], Dict]
+    # Represents a function that performs a single iteration of the experiment.
+    # It accepts the run parameters (independent variables), and returns a dict with the run outcomes.
 
 
 class Experiment:
@@ -69,8 +77,9 @@ class Experiment:
         # self.dataFrame = self.dataFrame.append(pandas.Series(dataRow), ignore_index=True) # This is inefficient! It creates and returns a new dataFrame.
         self.to_csv(self.results_file)
 
+
     def run(self, 
-        single_run: Callable[[Any], Dict],
+        single_run: SingleIterationFunction,
         input_ranges: Dict[str,List[Any]]
         ):
         """
@@ -82,24 +91,75 @@ class Experiment:
         for input in dict_product(input_ranges):
             input_normalized = {k:normalized(v) for k,v in input.items()}
             logger.info("\nInput: %s", input_normalized)
-            if self.dataFrame is None:
-                output = single_run(**input)
-            else:
+            if self.dataFrame is not None:  # Check if there is an existing row:
                 try:
                     existing_row = dict_to_row(self.dataFrame, input_normalized)
                 except KeyError as err:
                     raise KeyError(f"You sent an input field that does not have a column in the existing CSV file. Please start a new CSV file. Error: ", {err} )
                 if existing_row:
-                    logger.info("Skipped! Existing row: %s", existing_row)
+                    logger.info("Skipped existing row: %s", existing_row)
                     continue
-                else:
-                    output = single_run(**input)
+            output = single_run(**input)
             if not isinstance(output, dict):
                 raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
             logger.info("Output: %s", output)
             self.add({**input_normalized, **output})
-
         logger.info("\nDone!")
+
+
+    def run_with_time_limit(self, 
+        single_run: SingleIterationFunction,
+        input_ranges: Dict[str,List[Any]],
+        time_limit: float
+        ):
+        """
+        Runs the experiment, changing each parameter in the given range.
+        Measures the run-time of each single run. If the run-time is above the given time-limit,
+            it will not run experiments with larger input values.
+
+        :param single_run:   a function that performs a single run. It accepts the run parameters (independent variables), and returns a dict with the run outcomes.
+        :param input_ranges: a dict where the key is the parameter name, and the value is a list of possible values for that parameter.
+        :param time_limit: the maximum time for a single run.
+        """
+
+        for input in dict_product(input_ranges):
+            input_normalized = {k:normalized(v) for k,v in input.items()}
+            logger.info("\nInput: %s", input_normalized)
+            if self.dataFrame is not None:  # Check if there is an existing row:
+                try:
+                    existing_row = dict_to_row(self.dataFrame, input_normalized)
+                except KeyError as err:
+                    raise KeyError(f"You sent an input field that does not have a column in the existing CSV file. Please start a new CSV file. Error: ", {err} )
+                if existing_row:
+                    logger.info("Skipped. Existing row: %s", existing_row)
+                    continue
+                dominating_row = dict_to_row_bounds(self.dataFrame, lowerbound={RUNTIME_FIELD_NAME: time_limit}, upperbound=input_normalized)
+                if dominating_row:
+                    logger.info("Skipped a combination that would probably take longer than the time-limit %f. Existing row: %s", time_limit, dominating_row)
+                    continue
+            
+            time_before = perf_counter()
+            output = single_run(**input)
+            runtime = perf_counter() - time_before
+            output[RUNTIME_FIELD_NAME] = runtime
+
+            if not isinstance(output, dict):
+                raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
+            logger.info("Output: %s", output)
+            self.add({**input_normalized, **output})
+        logger.info("\nDone!")
+
+
+
+
+def add_runtime_to_output(single_run: SingleIterationFunction):
+    def single_run_with_runtime(**kwargs):
+        time_before = perf_counter()
+        output = single_run(**kwargs)
+        runtime = perf_counter() - time_before
+        output[RUNTIME_FIELD_NAME] = runtime
+        return output
+    return single_run_with_runtime
 
 
 def normalized(value):
