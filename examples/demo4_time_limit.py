@@ -1,7 +1,6 @@
 """
-Demo 3: Demonstrates runs that take a long time.
-You can stop the run and then re-start it,
-    and it will pick up where it left.
+Demo 4: Demonstrates running with a time-limit.
+    The runner will automatically skip instances that will probably take more than the time-limit.
 """
 import time
 
