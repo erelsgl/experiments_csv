@@ -1,6 +1,7 @@
 import pandas
 import matplotlib as plt
 from experiments_csv.dict_to_row import dict_to_rows
+# from typing import List
 
 import logging
 logger = logging.getLogger(__name__)
@@ -17,14 +18,19 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
     results = pandas.read_csv(results_csv_file)
     results = dict_to_rows(results, filter)
     if len(filter)>0:
-        title = ", ".join([f"Plots results with {key}={value}" for key,value in filter.items()])
+        title = "Plots results with " + ", ".join([f"{key}={value}" for key,value in filter.items()])
     else:
         title = "Plotting all results"
     logger.info(title)
+
+    if isinstance(zcolumn, list):
+        zcolumn_join = ",".join(zcolumn)
+        results[zcolumn_join] = results[zcolumn].apply(lambda x: ",".join(map(str,x)), axis=1)
+        zcolumn=zcolumn_join
     zvalues = results[zcolumn].unique()
     zvalues.sort()
     for zvalue in zvalues:
-        label = f"{zcolumn}={zvalue}"
+        label = f"{zcolumn} = {zvalue}"
         logger.info("  Plotting %s",label)
         results_for_zvalue = results[results[zcolumn]==zvalue]
         ax.plot(results_for_zvalue[xcolumn], results_for_zvalue[ycolumn], label=label)
@@ -36,13 +42,5 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
     ax.show()
 
 plot_results.logger = logger
-
-if __name__ == "__main__":
-    logger.setLevel(logging.INFO)
-    logger.addHandler(logging.StreamHandler())
-    from matplotlib import pyplot as plt
-    plot_results(plt, "../examples/results/demo1.csv", filter={"z": 6}, xcolumn="x", ycolumn="sum", zcolumn="y")
-        # Should show two parallel straight lines.
-    plot_results(plt, "../examples/results/demo4.csv", filter={}, xcolumn="x", ycolumn="runtime", zcolumn="y")
-        # Should show two straight lines.
-
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
