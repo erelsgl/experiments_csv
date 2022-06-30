@@ -9,6 +9,22 @@ Suddenly, during one of the runs, the program crashes. You have to restart the e
 ## Solution
 `experiments_csv` saves all the experiment input and output data into a CSV file. When you restart the experiment, it reads the CSV file and notes all the input combinations for which the experiment already completed. It then automatically skips these input combinations.
 
+## Installation
+
+Basic installation:
+
+```
+    pip install experiments-csv
+```
+
+Installation with plotting ability:
+
+```
+    pip install experiments-csv[plotting]
+```
+
+
+
 ## Usage
 See the demo programs in the [examples](examples/) folder for usage examples. In detail, you should:
 
@@ -68,4 +84,13 @@ To log the inputs and outputs during run, you can do:
     ex.logger.setLevel(logging.INFO)
 ```
 
-See the [demo program](demo/demo.py) for usage example
+## Plotting
+
+To plot the results, you can use the `plot_results` function, for example:
+
+```
+    from matplotlib import pyplot as plt
+    experiments_csv.plot_results(plt, "results.csv", filter={"algorithm": "abc"}, xcolumn="size", ycolumn="runtime", zcolumn="bits")
+```
+
+See the [demo programs](demo/) for usage examples.
