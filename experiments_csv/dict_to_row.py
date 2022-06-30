@@ -8,11 +8,34 @@ Since: 2022-05
 import pandas
 from numbers import Number
 
-def dict_to_row(df: pandas.DataFrame, key:dict):
+def dict_to_rows(df: pandas.DataFrame, key:dict)->pandas.DataFrame:
+    """
+    Accepts a DataFrame and a dict mapping column-names to values.
+    Searches for rows in which the given columns contain the given values.
+    Returns a dataframe with only these rows.
+
+    >>> df = pandas.DataFrame({'a': [1,4,1], 'b': [2,5,5], 'c':[3,6,9], 'z':[123, 456, 159]})
+    >>> dict_to_rows(df, {"a":1})
+       a  b  c    z
+    0  1  2  3  123
+    2  1  5  9  159
+    >>> dict_to_rows(df, {"a":1, "b":2, "c":3})
+       a  b  c    z
+    0  1  2  3  123
+    >>> dict_to_rows(df, {"a":1, "b":2, "c":9})
+    Empty DataFrame
+    Columns: [a, b, c, z]
+    Index: []
+    """
+    for k,v in key.items():
+        df = df[df[k]==v]
+    return df
+
+def dict_to_row(df: pandas.DataFrame, key:dict)->dict:
     """
     Accepts a DataFrame and a dict mapping column-names to values.
     Searches a row in which the given columns contain the given values.
-    Returns one such row if it exists, or None if no such row exists.
+    Returns one such row if it exists (as a dict), or None if no such row exists.
 
     >>> df = pandas.DataFrame({'a': [1,4,1], 'b': [2,5,5], 'c':[3,6,9], 'z':[123, 456, 159]})
     >>> dict_to_row(df, {"a":1, "b":2, "c":3})
@@ -21,8 +44,7 @@ def dict_to_row(df: pandas.DataFrame, key:dict):
     >>> dict_to_row(df, {"a":1, "b":2, "c":9}) is None
     True
     """
-    for k,v in key.items():
-        df = df[df[k]==v]
+    df = dict_to_rows(df, key)
     if df.empty:
         return None
     else:

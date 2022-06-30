@@ -12,8 +12,6 @@ from time import perf_counter
 import logging
 logger = logging.getLogger(__name__)
 
-RUNTIME_FIELD_NAME="runtime"
-
 
 SingleIterationFunction = Callable[[Any], Dict]
     # Represents a function that performs a single iteration of the experiment.
@@ -80,7 +78,7 @@ class Experiment:
 
     def run(self, 
         single_run: SingleIterationFunction,
-        input_ranges: Dict[str,List[Any]]
+        input_ranges: Dict[str,List[Any]],
         ):
         """
         Runs the experiment, changing each parameter in the given range.
@@ -110,7 +108,8 @@ class Experiment:
     def run_with_time_limit(self, 
         single_run: SingleIterationFunction,
         input_ranges: Dict[str,List[Any]],
-        time_limit: float
+        time_limit: float,
+        runtime_field_name="runtime"
         ):
         """
         Runs the experiment, changing each parameter in the given range.
@@ -120,6 +119,7 @@ class Experiment:
         :param single_run:   a function that performs a single run. It accepts the run parameters (independent variables), and returns a dict with the run outcomes.
         :param input_ranges: a dict where the key is the parameter name, and the value is a list of possible values for that parameter.
         :param time_limit: the maximum time for a single run.
+        :param runtime_field_name: the name of the column for storing the run-time.
         """
 
         for input in dict_product(input_ranges):
@@ -133,7 +133,7 @@ class Experiment:
                 if existing_row:
                     logger.info("Skipped. Existing row: %s", existing_row)
                     continue
-                dominating_row = dict_to_row_bounds(self.dataFrame, lowerbound={RUNTIME_FIELD_NAME: time_limit}, upperbound=input_normalized)
+                dominating_row = dict_to_row_bounds(self.dataFrame, lowerbound={runtime_field_name: time_limit}, upperbound=input_normalized)
                 if dominating_row:
                     logger.info("Skipped a combination that would probably take longer than the time-limit %f. Existing row: %s", time_limit, dominating_row)
                     continue
@@ -141,7 +141,7 @@ class Experiment:
             time_before = perf_counter()
             output = single_run(**input)
             runtime = perf_counter() - time_before
-            output[RUNTIME_FIELD_NAME] = runtime
+            output[runtime_field_name] = runtime
 
             if not isinstance(output, dict):
                 raise ValueError(f"single_run must return a dict output, mapping each output variable name to its value. It returned {type(output)}.")
@@ -149,17 +149,6 @@ class Experiment:
             self.add({**input_normalized, **output})
         logger.info("\nDone!")
 
-
-
-
-def add_runtime_to_output(single_run: SingleIterationFunction):
-    def single_run_with_runtime(**kwargs):
-        time_before = perf_counter()
-        output = single_run(**kwargs)
-        runtime = perf_counter() - time_before
-        output[RUNTIME_FIELD_NAME] = runtime
-        return output
-    return single_run_with_runtime
 
 
 def normalized(value):

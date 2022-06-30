@@ -17,6 +17,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     version=VERSION,
     install_requires=REQUIRES,
+    extras_require = {
+        "plotting": ["matplotlib"]
+    },
     author="Erel Segal-Halevi",
     author_email="erelsgl@gmail.com",
     description="Simple framework for running simulation experiments and recording them in a CSV file",

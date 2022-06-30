@@ -1,5 +1,5 @@
 """
-Demo 2: Demonstrates passing functions as arguments.
+Demo 2: Passing functions as arguments.
 """
 
 

@@ -1,6 +1,6 @@
 """
-Demo 4: Demonstrates running with a time-limit.
-    The runner will automatically skip instances that will probably take more than the time-limit.
+Demo 4: Running with a time-limit.
+    The runner automatically skips instances that will probably take more than the time-limit.
 """
 import time
 

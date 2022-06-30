@@ -1,7 +1,6 @@
 """
-Demo 3: Demonstrates runs that take a long time.
-You can stop the run and then re-start it,
-    and it will pick up where it left.
+Demo 3: Stopping a long run in the middle (e.g. using Ctrl+C), and then re-starting it.
+    It will pick up where it left.
 """
 import time
 
