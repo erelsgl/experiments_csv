@@ -6,7 +6,7 @@ from experiments_csv.dict_to_row import dict_to_rows
 import logging
 logger = logging.getLogger(__name__)
 
-def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str, zcolumn:str):
+def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str, zcolumn:str, mean:bool=True):
     """
     Plot on the given axis, results from the given file.
 
@@ -14,6 +14,7 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
     :param xcolumn: name of column for x axis.
     :param ycolumn: name of column for y axis.
     :param zcolumn: name of column for z axis (for each value of z, there will be a different plot).
+    :param mean: if True, it makes a line-plot of the mean over all rows with the same xcolumn and zcolumn. If False, it makes a scatter-plot of all values.
     """
     results = pandas.read_csv(results_csv_file)
     results = dict_to_rows(results, filter)
@@ -33,11 +34,17 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
         label = f"{zcolumn} = {zvalue}"
         logger.info("  Plotting %s",label)
         results_for_zvalue = results[results[zcolumn]==zvalue]
-        ax.plot(results_for_zvalue[xcolumn], results_for_zvalue[ycolumn], label=label)
+        # print("results_for_zvalue", results_for_zvalue)
+        if mean:
+            mean_results_for_zvalue = results_for_zvalue.groupby([xcolumn]).mean()
+            print("mean_results_for_zvalue", mean_results_for_zvalue)
+            ax.plot(mean_results_for_zvalue.index, mean_results_for_zvalue[ycolumn], label=label)
+        else:
+            ax.scatter(results_for_zvalue[xcolumn], results_for_zvalue[ycolumn], label=label)
         ax.legend()
 
     ax.xlabel(xcolumn)
-    ax.ylabel(ycolumn)
+    ax.ylabel(f"mean {ycolumn}" if mean else ycolumn)
     ax.title(title)
     ax.show()
 
