@@ -8,6 +8,7 @@ from experiments_csv.dict_product import dict_product
 from experiments_csv.dict_to_row import dict_to_row, dict_to_row_bounds
 from datetime import datetime
 from time import perf_counter
+import inspect
 
 import logging
 logger = logging.getLogger(__name__)
@@ -157,6 +158,8 @@ def normalized(value):
     """
     if hasattr(value,'__name__'):
         return value.__name__
+    elif hasattr(value,'__dict__'):  # value is an object of some class - use the class "__str__" method
+        return str(value)
     else:
         return value
 
