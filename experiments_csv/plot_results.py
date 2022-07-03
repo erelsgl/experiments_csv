@@ -6,7 +6,7 @@ from experiments_csv.dict_to_row import dict_to_rows
 import logging
 logger = logging.getLogger(__name__)
 
-def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str, zcolumn:str, mean:bool=True):
+def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str, zcolumn:str, mean:bool=True, legend_properties={'size':8}):
     """
     Plot on the given axis, results from the given file.
 
@@ -19,9 +19,9 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
     results = pandas.read_csv(results_csv_file)
     results = dict_to_rows(results, filter)
     if len(filter)>0:
-        title = "Plots results with " + ", ".join([f"{key}={value}" for key,value in filter.items()])
+        title = ", ".join([f"{key}={value}" for key,value in filter.items()])
     else:
-        title = "Plotting all results"
+        title = "All results"
     logger.info(title)
 
     if isinstance(zcolumn, list):
@@ -31,7 +31,8 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
     zvalues = results[zcolumn].unique()
     zvalues.sort()
     for zvalue in zvalues:
-        label = f"{zcolumn} = {zvalue}"
+        # label = f"{zcolumn} = {zvalue}"
+        label = zvalue
         logger.info("  Plotting %s",label)
         results_for_zvalue = results[results[zcolumn]==zvalue]
         # print("results_for_zvalue", results_for_zvalue)
@@ -41,12 +42,16 @@ def plot_results(ax, results_csv_file:str, filter:dict, xcolumn:str, ycolumn:str
             ax.plot(mean_results_for_zvalue.index, mean_results_for_zvalue[ycolumn], label=label)
         else:
             ax.scatter(results_for_zvalue[xcolumn], results_for_zvalue[ycolumn], label=label)
-        ax.legend()
+        ax.legend(prop=legend_properties)
 
-    ax.xlabel(xcolumn)
-    ax.ylabel(f"mean {ycolumn}" if mean else ycolumn)
-    ax.title(title)
-    ax.show()
+    try:
+        ax.set_xlabel(xcolumn)
+        ax.set_ylabel(f"mean {ycolumn}" if mean else ycolumn)
+        ax.set_title(title)
+    except AttributeError:
+        ax.xlabel(xcolumn)
+        ax.ylabel(f"mean {ycolumn}" if mean else ycolumn)
+        ax.title(title)
 
 plot_results.logger = logger
 logger.setLevel(logging.INFO)
