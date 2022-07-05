@@ -132,7 +132,7 @@ class Experiment:
                 except KeyError as err:
                     raise KeyError(f"You sent an input field that does not have a column in the existing CSV file. Please start a new CSV file. Error: ", {err} )
                 if existing_row:
-                    logger.info("Skipped. Existing row: %s", existing_row)
+                    logger.info("Existing row skipped: %s", existing_row)
                     continue
                 dominating_row = dict_to_row_bounds(self.dataFrame, lowerbound={runtime_field_name: time_limit}, upperbound=input_normalized)
                 if dominating_row:
