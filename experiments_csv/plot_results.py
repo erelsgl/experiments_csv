@@ -44,6 +44,7 @@ def plot_dataframe(ax, results: pandas.DataFrame,
 
 def single_plot_results(results_csv_file:str, filter:dict, 
     x_field:str, y_field:str, z_field:str, mean:bool=True, 
+    save_to_file:bool=False,
     **kwargs):
     """
     Make a single plot of results from the given file.
@@ -55,6 +56,7 @@ def single_plot_results(results_csv_file:str, filter:dict,
     :param y_field: name of column for y axis.
     :param z_field: name of column for different lines in the same plot (for each value of this column, there will be a different line).
     :param mean: if True, it makes a line-plot of the mean over all rows with the same xcolumn and zcolumn. If False, it makes a scatter-plot of all values.
+    :param save_to_file: if True, it saves the plot to a PNG file with the same name as the results_csv_file. If False, it just shows the plot.
 
     :param kwargs: arguments to delegate to plot_dataframe.
     """
@@ -74,12 +76,20 @@ def single_plot_results(results_csv_file:str, filter:dict,
     plt.ylabel(ylabel)
     plt.title(title)
 
+    if save_to_file:
+        output_file = results_csv_file.replace(".csv",".png")
+        plt.savefig(output_file)
+    else:
+        plt.show()
+
+
 
 
 def multi_plot_results(results_csv_file:str, filter:dict,
     x_field:str, y_field:str, z_field:str, mean:bool, 
     subplot_field:str, subplot_rows:int, subplot_cols:int, 
     sharex: bool=False, sharey: bool=False,
+    save_to_file:bool=False,
     **kwargs):
     """
     Make multiple plots (on subplots of the same figure), each time with a different value of the subplot_field column.
@@ -97,6 +107,7 @@ def multi_plot_results(results_csv_file:str, filter:dict,
     :param subplot_cols: num of cols in the subplots grid
     :param sharex: whether to share the x axis between subplots.
     :param sharey: whether to share the y axis between subplots.
+    :param save_to_file: if True, it saves the plot to a PNG file with the same name as the results_csv_file. If False, it just shows the plot.
 
     :param kwargs: arguments to delegate to plot_dataframe.
     """
@@ -137,6 +148,11 @@ def multi_plot_results(results_csv_file:str, filter:dict,
     fig.supylabel(ylabel)
     fig.suptitle(suptitle)
 
+    if save_to_file:
+        output_file = results_csv_file.replace(".csv",".png")
+        fig.savefig(output_file)
+    else:
+        plt.show()
 
 
 plot_dataframe.logger = single_plot_results.logger = multi_plot_results.logger = logger
