@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def plot_dataframe(ax, results: pandas.DataFrame,
     x_field:str, y_field:str, z_field:str, mean:bool=True, 
-    legend_properties={'size':8}):
+    legend_properties={'size':8}, xlim=None, ylim=None):
     """
     Plot on the given axis, results from the given pandas dataframe.
 
@@ -33,13 +33,27 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         logger.info("    Line: %s=%s",z_field, z_value)
         results_for_z_value = results[results[z_field]==z_value]
         # label = z_value
-        label = f"{z_field}={z_value}"
+        if isinstance(z_value,int):
+            label = f"{z_field}={z_value}"
+        else:
+            label = z_value
         if mean:
             mean_results_for_z_value = results_for_z_value.groupby([x_field]).mean()
             ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
         else:
             ax.scatter(results_for_z_value[x_field], results_for_z_value[y_field], label=label)
         ax.legend(prop=legend_properties)
+
+    if xlim is not None:
+        try:
+            ax.set_xlim(*xlim)
+        except AttributeError:
+            ax.xlim(*xlim)
+    if ylim is not None:
+        try:
+            ax.set_ylim(*ylim)
+        except AttributeError:
+            ax.ylim(*ylim)
 
 
 def single_plot_results(results_csv_file:str, filter:dict, 
