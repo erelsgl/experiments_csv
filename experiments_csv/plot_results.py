@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def plot_dataframe(ax, results: pandas.DataFrame,
     x_field:str, y_field:str, z_field:str, mean:bool=True, 
-    legend_properties={'size':8}, xlim=None, ylim=None):
+    xlim=None, ylim=None):
     """
     Plot on the given axis, results from the given pandas dataframe.
 
@@ -38,11 +38,13 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         else:
             label = z_value
         if mean:
-            mean_results_for_z_value = results_for_z_value[[x_field,y_field]].groupby([x_field]).mean()
-            ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
+            try:
+                mean_results_for_z_value = results_for_z_value[[x_field,y_field]].groupby([x_field]).mean()
+                ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
+            except:
+                raise TypeError(f"Cannot take the mean when grouping by x_field={x_field}")
         else:
             ax.scatter(results_for_z_value[x_field], results_for_z_value[y_field], label=label)
-        ax.legend(prop=legend_properties)
 
     if xlim is not None:
         try:
@@ -56,9 +58,10 @@ def plot_dataframe(ax, results: pandas.DataFrame,
             ax.ylim(*ylim)
 
 
+
 def single_plot_results(results_csv_file:str, filter:dict, 
     x_field:str, y_field:str, z_field:str, mean:bool=True, 
-    save_to_file:bool=False,
+    save_to_file:bool=False, legend_properties={'size':8}, 
     **kwargs):
     """
     Make a single plot of results from the given file.
@@ -84,6 +87,7 @@ def single_plot_results(results_csv_file:str, filter:dict,
     plot_dataframe(plt, results, 
         x_field, y_field, z_field, mean, 
         **kwargs)
+    plt.legend(prop=legend_properties)
 
     plt.xlabel(x_field)
     ylabel = f"mean {y_field}" if mean else y_field
@@ -104,7 +108,7 @@ def multi_plot_results(results_csv_file:str, filter:dict,
     subplot_field:str, subplot_rows:int, subplot_cols:int, 
     sharex: bool=False, sharey: bool=False,
     save_to_file:bool=False,
-    **kwargs):
+    legend_properties={'size':8}, **kwargs):
     """
     Make multiple plots (on subplots of the same figure), each time with a different value of the subplot_field column.
 
@@ -155,6 +159,8 @@ def multi_plot_results(results_csv_file:str, filter:dict,
             x_field, y_field, z_field, mean, 
             **kwargs)
         axs[axs_index].set_title(subtitle)
+        if axs_index==0:
+            axs[axs_index].legend(prop=legend_properties)
         axs_index += 1
 
     fig.supxlabel(x_field)
