@@ -38,7 +38,7 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         else:
             label = z_value
         if mean:
-            mean_results_for_z_value = results_for_z_value.groupby([x_field]).mean()
+            mean_results_for_z_value = results_for_z_value[[x_field,y_field]].groupby([x_field]).mean()
             ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
         else:
             ax.scatter(results_for_z_value[x_field], results_for_z_value[y_field], label=label)
