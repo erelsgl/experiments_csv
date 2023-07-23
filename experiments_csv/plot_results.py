@@ -61,7 +61,7 @@ def plot_dataframe(ax, results: pandas.DataFrame,
 
 def single_plot_results(results_csv_file:str, filter:dict, 
     x_field:str, y_field:str, z_field:str, mean:bool=True, 
-    save_to_file:bool=False, legend_properties={'size':8}, 
+    save_to_file:str=None, legend_properties={'size':8}, 
     **kwargs):
     """
     Make a single plot of results from the given file.
@@ -95,7 +95,12 @@ def single_plot_results(results_csv_file:str, filter:dict,
     plt.title(title)
 
     if save_to_file:
-        output_file = results_csv_file.replace(".csv",".png")
+        if save_to_file == True:
+            output_file = results_csv_file.replace(".csv",".png")
+        elif isinstance(save_to_file,str):
+            output_file = save_to_file
+        else:
+            raise TypeError(f"Unsupported type of save_to_file: {save_to_file}")
         plt.savefig(output_file)
     else:
         plt.show()
@@ -107,7 +112,7 @@ def multi_plot_results(results_csv_file:str, filter:dict,
     x_field:str, y_field:str, z_field:str, mean:bool, 
     subplot_field:str, subplot_rows:int, subplot_cols:int, 
     sharex: bool=False, sharey: bool=False,
-    save_to_file:bool=False,
+    save_to_file:str=None,
     legend_properties={'size':8}, **kwargs):
     """
     Make multiple plots (on subplots of the same figure), each time with a different value of the subplot_field column.
@@ -169,8 +174,13 @@ def multi_plot_results(results_csv_file:str, filter:dict,
     fig.suptitle(suptitle)
 
     if save_to_file:
-        output_file = results_csv_file.replace(".csv",".png")
-        fig.savefig(output_file)
+        if save_to_file == True:
+            output_file = results_csv_file.replace(".csv",".png")
+        elif isinstance(save_to_file,str):
+            output_file = save_to_file
+        else:
+            raise TypeError(f"Unsupported type of save_to_file: {save_to_file}")
+        plt.savefig(output_file)
     else:
         plt.show()
 
