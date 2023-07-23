@@ -27,9 +27,20 @@ def dict_to_rows(df: pandas.DataFrame, key:dict)->pandas.DataFrame:
     Empty DataFrame
     Columns: [a, b, c, z]
     Index: []
+    >>> dict_to_rows(df, {"c":[3,9]})
+       a  b  c    z
+    0  1  2  3  123
+    2  1  5  9  159
+    >>> dict_to_rows(df, {"c":{3,9}})
+       a  b  c    z
+    0  1  2  3  123
+    2  1  5  9  159
     """
     for k,v in key.items():
-        df = df[df[k]==v]
+        if isinstance(v, list) or isinstance(v,set):
+            df = df[df[k].isin(v)]
+        else:
+            df = df[df[k]==v]
     return df
 
 def dict_to_row(df: pandas.DataFrame, key:dict)->dict:

@@ -39,7 +39,7 @@ setuptools.setup(
 )
 
 # Build:
-#   Delete old folders: build, dist, *.egg_info, .venv_test.
+#   Delete old folders: build, dist, *.egg_info
 #   Then run:
 #        python -m build
 #   Or (old version):
