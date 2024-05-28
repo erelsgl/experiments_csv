@@ -18,7 +18,7 @@ setuptools.setup(
     version=VERSION,
     install_requires=REQUIRES,
     extras_require = {
-        "plotting": ["matplotlib"]
+        "plotting": ["matplotlib>=3.9.0"]
     },
     author="Erel Segal-Halevi",
     author_email="erelsgl@gmail.com",

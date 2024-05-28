@@ -1,5 +1,9 @@
 """
 Demo 5: plotting experiment results.
+
+To use, install as:
+
+   pip install experiments_csv[plotting]
 """
 
 from experiments_csv import *
