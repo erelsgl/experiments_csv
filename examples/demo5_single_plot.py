@@ -21,5 +21,5 @@ single_plot_results("../examples/results/demo1.csv", filter={}, x_field="x", y_f
 single_plot_results("../examples/results/demo4.csv", filter={}, x_field="x", y_field="runtime", z_field="y")
     # Should show two straight lines.
 
-single_plot_results("../examples/results/demo4.csv", filter={}, x_field="x", y_field="runtime", z_field="y", save_to_file=True)
+single_plot_results("../examples/results/demo4.csv", filter={}, x_field="x", y_field="runtime", z_field="y", save_to_file="../examples/results/demo4.png")
     # Should save the last plot to file "results/demo4.png"

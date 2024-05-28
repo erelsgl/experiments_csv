@@ -14,5 +14,5 @@ multi_plot_results("../examples/results/demo1.csv", filter={}, subplot_field="z"
     # Should show two-by-two subplots.
 
 multi_plot_results("../examples/results/demo1.csv", filter={}, subplot_field="z", subplot_rows=2, subplot_cols=2,
-    x_field="x", y_field="sum", z_field="y", sharex=True, sharey=True, mean=True, save_to_file=True)
+    x_field="x", y_field="sum", z_field="y", sharex=True, sharey=True, mean=True, save_to_file="../examples/results/demo1.png")
     # Should save the last plot to file "results/demo1.png"
