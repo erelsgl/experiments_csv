@@ -1,6 +1,7 @@
 import pandas
 from matplotlib import pyplot as plt
 from experiments_csv.dict_to_row import dict_to_rows
+from numbers import Number
 # from typing import List
 
 import logging
@@ -33,7 +34,7 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         logger.info("    Line: %s=%s",z_field, z_value)
         results_for_z_value = results[results[z_field]==z_value]
         # label = z_value
-        if isinstance(z_value,int):
+        if isinstance(z_value,Number):
             label = f"{z_field}={z_value}"
         else:
             label = z_value
