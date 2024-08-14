@@ -2,7 +2,7 @@ import pandas
 from matplotlib import pyplot as plt
 from experiments_csv.dict_to_row import dict_to_rows
 from numbers import Number
-# from typing import List
+import numbers
 
 import logging
 logger = logging.getLogger(__name__)
@@ -39,11 +39,14 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         else:
             label = z_value
         if mean:
+            first_y_value = results_for_z_value[y_field][0]
+            if not isinstance(first_y_value, numbers.Number):
+                raise ValueError(f"First value in field {y_field} is {first_y_value}, which is not a number. Cannot take its mean.")
             try:
                 mean_results_for_z_value = results_for_z_value[[x_field,y_field]].groupby([x_field]).mean()
-                ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
             except:
-                raise TypeError(f"Cannot take the mean when grouping by x_field={x_field}")
+                raise TypeError(f"When grouping by {x_field}, I cannot take the mean of y_field={y_field}.\nSample values: {results_for_z_value[y_field].to_list()}.")
+            ax.plot(mean_results_for_z_value.index, mean_results_for_z_value[y_field], label=label)
         else:
             ax.scatter(results_for_z_value[x_field], results_for_z_value[y_field], label=label)
 
