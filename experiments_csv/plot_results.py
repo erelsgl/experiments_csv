@@ -2,7 +2,7 @@ import pandas
 from matplotlib import pyplot as plt
 from experiments_csv.dict_to_row import dict_to_rows
 from numbers import Number
-import numbers
+import numbers, numpy as np
 
 import logging
 logger = logging.getLogger(__name__)
@@ -158,7 +158,10 @@ def multi_plot_results(results_csv_file:str, filter:dict,
         raise ValueError(f"Not enough subplots! {subplot_rows}*{subplot_cols} < len({subplot_values})")
 
     fig, axs = plt.subplots(subplot_rows, subplot_cols, sharex=sharex, sharey=sharey)
-    axs = axs.flatten()
+    if isinstance(axs, np.ndarray):
+        axs = axs.flatten()
+    else:
+        axs = [axs]
     axs_index = 0
     for subplot_value in subplot_values:
         subtitle = f"{subplot_field}={subplot_value}"
