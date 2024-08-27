@@ -39,7 +39,14 @@ def plot_dataframe(ax, results: pandas.DataFrame,
         else:
             label = z_value
         if mean:
-            first_y_value = results_for_z_value[y_field][0]
+            try:
+                first_y_value = results_for_z_value[y_field].iloc[0]
+            except KeyError as err:
+                print("results=",results)
+                print("results_for_z_value=", type(results_for_z_value), results_for_z_value)
+                print("y_field=",y_field)
+                print("results_for_z_value[y_field]=",type(results_for_z_value[y_field]), results_for_z_value[y_field])
+                raise(err)
             if not isinstance(first_y_value, numbers.Number):
                 raise ValueError(f"First value in field {y_field} is {first_y_value}, which is not a number. Cannot take its mean.")
             try:
@@ -190,6 +197,40 @@ def multi_plot_results(results_csv_file:str, filter:dict,
         plt.savefig(output_file)
     else:
         plt.show()
+
+
+def multi_multi_plot_results(results_csv_file:str, save_to_file_template:str, filter:dict, 
+     x_field:str, y_fields:list[str], z_field:str, mean:bool, 
+     subplot_field:str, subplot_rows:int, subplot_cols:int,  **kwargs):
+    """
+    Make multiple figures, each one for a specific y_field. (on subplots of the same figure), each time with a different value of the subplot_field column.
+
+    :param results_csv_file  path to the CSV file containing the results.
+    :param filter: a dict used to filter the rows of the results file. See dict_to_row.
+
+    :param x_field: name of column for x axis.
+    :param y_fields: list of columns for y axis; each will be plotted on a different figure.
+    :param z_field: name of column for different lines in the same plot (for each value of this column, there will be a different line).
+    :param mean: if True, it makes a line-plot of the mean over all rows with the same xcolumn and zcolumn. If False, it makes a scatter-plot of all values.
+
+    :param subplot_field: name of column for different subplots (for each value of this column, there will be a different subplot).
+    :param subplot_rows: num of rows in the subplots grid
+    :param subplot_cols: num of cols in the subplots grid
+    :param save_to_file_template: a format template for creating the png file for each y_field.
+
+    :param kwargs: arguments to delegate to plot_dataframe.
+    """
+    for y_field in y_fields:
+          save_to_file=save_to_file_template.format(y_field)
+          print(y_field, save_to_file)
+          multi_plot_results(
+               results_csv_file=results_csv_file,
+               save_to_file=save_to_file,
+               filter=filter, 
+               x_field=x_field, y_field=y_field, z_field=z_field, mean=mean, 
+               subplot_field=subplot_field, subplot_rows=subplot_rows, subplot_cols=subplot_cols, **kwargs
+               )
+
 
 
 plot_dataframe.logger = single_plot_results.logger = multi_plot_results.logger = logger
